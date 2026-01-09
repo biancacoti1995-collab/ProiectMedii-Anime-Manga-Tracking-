@@ -44,18 +44,21 @@ namespace ProiectMedii_Anime___Manga_Tracking_.Controllers
         }
 
         // GET: Categories/Create
+        // 1. Această metodă doar DESCHIDE pagina (GET)
+        // Dacă lipsește sau are [HttpPost] deasupra, dă eroare când încerci să intri pe pagină
+        [HttpGet]
         public IActionResult Create()
         {
             return View();
         }
 
-        // POST: Categories/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        // 2. Această metodă SALVEAZĂ datele (POST)
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,Name")] Category category)
         {
+            ModelState.Remove("MediaItems");
+
             if (ModelState.IsValid)
             {
                 _context.Add(category);

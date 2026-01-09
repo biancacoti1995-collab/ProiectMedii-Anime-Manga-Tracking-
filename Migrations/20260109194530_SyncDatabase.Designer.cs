@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using ProiectMedii_Anime___Manga_Tracking_.Data;
 
@@ -11,9 +12,11 @@ using ProiectMedii_Anime___Manga_Tracking_.Data;
 namespace ProiectMedii_Anime___Manga_Tracking_.Migrations
 {
     [DbContext(typeof(ProiectMedii_Anime___Manga_Tracking_Context))]
-    partial class ProiectMedii_Anime___Manga_Tracking_ContextModelSnapshot : ModelSnapshot
+    [Migration("20260109194530_SyncDatabase")]
+    partial class SyncDatabase
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
