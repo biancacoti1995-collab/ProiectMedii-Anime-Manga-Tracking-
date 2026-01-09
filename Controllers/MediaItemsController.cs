@@ -1,12 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using ProiectMedii_Anime___Manga_Tracking_.Data;
 using ProiectMedii_Anime___Manga_Tracking_.Models;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace ProiectMedii_Anime___Manga_Tracking_.Controllers
 {
@@ -56,15 +57,25 @@ namespace ProiectMedii_Anime___Manga_Tracking_.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,Title,Type,TotalVolumes")] MediaItem mediaItem)
         {
+            // Pasul A: Spunem programului să ignore faptul că nu am ales o Categorie sau Review-uri
+            ModelState.Remove("Category");
+            ModelState.Remove("Reviews");
+
+            // Pasul B: Dacă 'Type' e gol, îi dăm noi o valoare ca să nu dea eroare baza de date
+            if (string.IsNullOrEmpty(mediaItem.Type))
+            {
+                mediaItem.Type = "Anime";
+            }
+
             if (ModelState.IsValid)
             {
                 _context.Add(mediaItem);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                await _context.SaveChangesAsync(); // Aici se salvează în SQL
+                return RedirectToAction(nameof(Index)); // Te trimite la lista unde vei vedea noul rând
             }
+
             return View(mediaItem);
         }
-
         // GET: MediaItems/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
@@ -153,5 +164,43 @@ namespace ProiectMedii_Anime___Manga_Tracking_.Controllers
         {
             return _context.MediaItem.Any(e => e.Id == id);
         }
+
+        [HttpPost]
+        [Authorize]
+        public async Task<IActionResult> AddReview(int mediaId, int rating, string comment)
+        {
+            var review = new Review
+            {
+                MediaItemId = mediaId,
+                StarRating = rating,
+                Comment = comment,
+                UserEmail = User.Identity.Name // salvăm cine a scris review-ul
+            };
+
+            _context.Review.Add(review);
+            await _context.SaveChangesAsync();
+            return RedirectToAction(nameof(Details), new { id = mediaId });
+        }
+
+        [HttpPost]
+        [Authorize]
+        public async Task<IActionResult> UpdateProgress(int mediaId, int progress)
+        {
+           
+            var tracker = await _context.UserTracker
+                .FirstOrDefaultAsync(t => t.MediaItemId == mediaId && t.UserEmail == User.Identity.Name);
+
+            if (tracker == null)
+            {
+                tracker = new UserTracker { MediaItemId = mediaId, UserEmail = User.Identity.Name };
+                _context.UserTracker.Add(tracker);
+            }
+
+            tracker.CurrentProgress = progress;
+            await _context.SaveChangesAsync();
+            return RedirectToAction(nameof(Details), new { id = mediaId });
+        }
+
     }
 }
+    

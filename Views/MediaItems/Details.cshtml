@@ -1,36 +1,59 @@
 ﻿@model ProiectMedii_Anime___Manga_Tracking_.Models.MediaItem
 
 @{
-    ViewData["Title"] = "Details";
+    ViewData["Title"] = "Detalii " + Model.Title;
 }
 
-<h1>Details</h1>
+<div class="container mt-4" style="background-color: #FFF9FB; padding: 20px; border-radius: 20px; border: 3px solid #FFD1DC;">
+    <h1 style="color: #6A5ACD; font-family: 'Comic Sans MS', cursive;">@Model.Title</h1>
+    <hr style="border-top: 2px solid #AEC6CF;" />
 
-<div>
-    <h4>MediaItem</h4>
-    <hr />
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Title)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Title)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Type)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Type)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.TotalVolumes)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.TotalVolumes)
-        </dd>
-    </dl>
-</div>
-<div>
-    <a asp-action="Edit" asp-route-id="@Model?.Id">Edit</a> |
-    <a asp-action="Index">Back to List</a>
+    <div class="row">
+        <div class="col-md-6">
+            <dl class="row">
+                <dt class="col-sm-4">Tip:</dt>
+                <dd class="col-sm-8"><span class="badge" style="background-color: #B2F2BB; color: #444;">@Model.Type</span></dd>
+
+                <dt class="col-sm-4">Total Episoade/Capitole:</dt>
+                <dd class="col-sm-8">@Model.TotalVolumes</dd>
+            </dl>
+        </div>
+
+        <div class="col-md-6">
+            <div style="background-color: #E0FBE2; padding: 15px; border-radius: 15px; margin-bottom: 20px; border: 1px solid #c3e6cb;">
+                <h4 style="color: #2D5A27;">🚀 Urmărește Progresul</h4>
+                <form asp-controller="Media" asp-action="UpdateProgress" method="post">
+                    <input type="hidden" name="mediaId" value="@Model.Id" />
+                    <div class="input-group mb-2">
+                        <input type="number" name="progress" class="form-control" placeholder="La ce capitol ești?" required />
+                        <button type="submit" class="btn" style="background-color: #B2F2BB; border: 1px solid #2D5A27;">Update</button>
+                    </div>
+                </form>
+            </div>
+
+            <div style="background-color: #FFF0F5; padding: 15px; border-radius: 15px; border: 1px solid #f5c6cb;">
+                <h4 style="color: #C71585;">⭐ Lasă un Rating</h4>
+                <form asp-controller="Media" asp-action="AddReview" method="post">
+                    <input type="hidden" name="mediaId" value="@Model.Id" />
+                    <div class="mb-2">
+                        <select name="rating" class="form-control">
+                            @for (int i = 10; i >= 1; i--)
+                            {
+                                <option value="@i">@i Stele</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="mb-2">
+                        <textarea name="comment" class="form-control" placeholder="Ce părere ai despre acest titlu?" required></textarea>
+                    </div>
+                    <button type="submit" class="btn w-100" style="background-color: #FFB6C1; color: white; font-weight: bold;">Trimite Recenzia</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="mt-4">
+        <a asp-action="Edit" asp-route-id="@Model?.Id" class="btn btn-sm btn-outline-secondary">Edit</a> |
+        <a asp-action="Index" class="btn btn-sm btn-outline-primary">Back to List</a>
+    </div>
 </div>

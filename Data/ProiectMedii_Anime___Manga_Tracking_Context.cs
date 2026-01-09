@@ -16,5 +16,8 @@ namespace ProiectMedii_Anime___Manga_Tracking_.Data
 
         public DbSet<ProiectMedii_Anime___Manga_Tracking_.Models.MediaItem> MediaItem { get; set; } = default!;
         public DbSet<ProiectMedii_Anime___Manga_Tracking_.Models.Review> Review { get; set; } = default!;
+        public DbSet<ProiectMedii_Anime___Manga_Tracking_.Models.Category> Category { get; set; } = default!;
+        public DbSet<ProiectMedii_Anime___Manga_Tracking_.Models.UserTracker> UserTracker { get; set; } = default!;
+
     }
 }
