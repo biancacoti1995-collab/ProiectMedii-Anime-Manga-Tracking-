@@ -5,7 +5,7 @@
 namespace ProiectMedii_Anime___Manga_Tracking_.Migrations
 {
     /// <inheritdoc />
-    public partial class ImplementareSistemComplet : Migration
+    public partial class SyncDatabase : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)

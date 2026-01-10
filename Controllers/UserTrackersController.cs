@@ -57,18 +57,35 @@ namespace ProiectMedii_Anime___Manga_Tracking_.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,MediaItemId,UserEmail,CurrentProgress,Status")] UserTracker userTracker)
+        public async Task<IActionResult> Create([Bind("Id,MediaItemId,UserId,Status,CurrentVolume,Rating")] UserTracker userTracker)
         {
+            // Pasul 1: Ștergem manual erorile care blochează salvarea
+            ModelState.Remove("User");
+            ModelState.Remove("MediaItem");
+            ModelState.Remove("UserId"); // Uneori IdentityUser cere validare și pe ID ca string
+
+            
+            if (userTracker.MediaItemId != 0)
+            { 
+                
+                var emailErrors = ModelState["User.Id"];
+                if (emailErrors != null) emailErrors.Errors.Clear();
+
+                var userErrors = ModelState["User"];
+                if (userErrors != null) userErrors.Errors.Clear();
+            }
+
             if (ModelState.IsValid)
             {
                 _context.Add(userTracker);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
+
+            // Dacă tot ajunge aici (eșuează), reconstruim listele
             ViewData["MediaItemId"] = new SelectList(_context.MediaItem, "Id", "Title", userTracker.MediaItemId);
             return View(userTracker);
         }
-
         // GET: UserTrackers/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
@@ -91,7 +108,7 @@ namespace ProiectMedii_Anime___Manga_Tracking_.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,MediaItemId,UserEmail,CurrentProgress,Status")] UserTracker userTracker)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,MediaItemId,UserId,CurrentProgress,Status")] UserTracker userTracker)
         {
             if (id != userTracker.Id)
             {

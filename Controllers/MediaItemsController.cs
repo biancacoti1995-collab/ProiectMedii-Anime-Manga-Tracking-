@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -14,7 +15,7 @@ namespace ProiectMedii_Anime___Manga_Tracking_.Controllers
     public class MediaItemsController : Controller
     {
         private readonly ProiectMedii_Anime___Manga_Tracking_Context _context;
-
+        private readonly UserManager<IdentityUser> _userManager;
         public MediaItemsController(ProiectMedii_Anime___Manga_Tracking_Context context)
         {
             _context = context;
@@ -186,21 +187,37 @@ namespace ProiectMedii_Anime___Manga_Tracking_.Controllers
         [Authorize]
         public async Task<IActionResult> UpdateProgress(int mediaId, int progress)
         {
-           
+            // 1. Obținem ID-ul utilizatorului logat (nu email-ul)
+            var userId = _userManager.GetUserId(User);
+
+            if (string.IsNullOrEmpty(userId))
+            {
+                return Challenge(); // Te trimite la Login dacă nu ești logat
+            }
+
+            // 2. Căutăm tracker-ul folosind UserId
             var tracker = await _context.UserTracker
-                .FirstOrDefaultAsync(t => t.MediaItemId == mediaId && t.UserEmail == User.Identity.Name);
+                .FirstOrDefaultAsync(t => t.MediaItemId == mediaId && t.UserId == userId);
 
             if (tracker == null)
             {
-                tracker = new UserTracker { MediaItemId = mediaId, UserEmail = User.Identity.Name };
+                // 3. Dacă nu există, creăm unul nou cu UserId
+                tracker = new UserTracker
+                {
+                    MediaItemId = mediaId,
+                    UserId = userId,
+                    Status = "In Progress" // Punem un status default obligatoriu
+                };
                 _context.UserTracker.Add(tracker);
             }
 
+            // 4. Actualizăm progresul
             tracker.CurrentProgress = progress;
+
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Details), new { id = mediaId });
         }
-
     }
 }
-    
+
+

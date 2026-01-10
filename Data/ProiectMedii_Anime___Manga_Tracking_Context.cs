@@ -1,23 +1,22 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using ProiectMedii_Anime___Manga_Tracking_.Models;
 
 namespace ProiectMedii_Anime___Manga_Tracking_.Data
 {
-    public class ProiectMedii_Anime___Manga_Tracking_Context : DbContext
+    
+    public class ProiectMedii_Anime___Manga_Tracking_Context : IdentityDbContext
     {
-        public ProiectMedii_Anime___Manga_Tracking_Context (DbContextOptions<ProiectMedii_Anime___Manga_Tracking_Context> options)
+        public ProiectMedii_Anime___Manga_Tracking_Context(DbContextOptions<ProiectMedii_Anime___Manga_Tracking_Context> options)
             : base(options)
         {
         }
 
-        public DbSet<ProiectMedii_Anime___Manga_Tracking_.Models.MediaItem> MediaItem { get; set; } = default!;
-        public DbSet<ProiectMedii_Anime___Manga_Tracking_.Models.Review> Review { get; set; } = default!;
-        public DbSet<ProiectMedii_Anime___Manga_Tracking_.Models.Category> Category { get; set; } = default!;
-        public DbSet<ProiectMedii_Anime___Manga_Tracking_.Models.UserTracker> UserTracker { get; set; } = default!;
+    
+        public DbSet<MediaItem> MediaItem { get; set; } = default!;
+        public DbSet<Category> Category { get; set; } = default!;
+        public DbSet<Review> Review { get; set; } = default!;
 
+        public DbSet<UserTracker> UserTracker { get; set; } = default!;
     }
 }
