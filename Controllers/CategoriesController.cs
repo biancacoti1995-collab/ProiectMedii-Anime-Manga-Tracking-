@@ -43,16 +43,12 @@ namespace ProiectMedii_Anime___Manga_Tracking_.Controllers
             return View(category);
         }
 
-        // GET: Categories/Create
-        // 1. Această metodă doar DESCHIDE pagina (GET)
-        // Dacă lipsește sau are [HttpPost] deasupra, dă eroare când încerci să intri pe pagină
         [HttpGet]
         public IActionResult Create()
         {
             return View();
         }
 
-        // 2. Această metodă SALVEAZĂ datele (POST)
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,Name")] Category category)

@@ -59,10 +59,10 @@ namespace ProiectMedii_Anime___Manga_Tracking_.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,MediaItemId,UserId,Status,CurrentVolume,Rating")] UserTracker userTracker)
         {
-            // Pasul 1: Ștergem manual erorile care blochează salvarea
+
             ModelState.Remove("User");
             ModelState.Remove("MediaItem");
-            ModelState.Remove("UserId"); // Uneori IdentityUser cere validare și pe ID ca string
+            ModelState.Remove("UserId");
 
             
             if (userTracker.MediaItemId != 0)
@@ -82,11 +82,10 @@ namespace ProiectMedii_Anime___Manga_Tracking_.Controllers
                 return RedirectToAction(nameof(Index));
             }
 
-            // Dacă tot ajunge aici (eșuează), reconstruim listele
             ViewData["MediaItemId"] = new SelectList(_context.MediaItem, "Id", "Title", userTracker.MediaItemId);
             return View(userTracker);
         }
-        // GET: UserTrackers/Edit/5
+        
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)

@@ -58,11 +58,10 @@ namespace ProiectMedii_Anime___Manga_Tracking_.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,Title,Type,TotalVolumes")] MediaItem mediaItem)
         {
-            // Pasul A: Spunem programului să ignore faptul că nu am ales o Categorie sau Review-uri
             ModelState.Remove("Category");
             ModelState.Remove("Reviews");
 
-            // Pasul B: Dacă 'Type' e gol, îi dăm noi o valoare ca să nu dea eroare baza de date
+           
             if (string.IsNullOrEmpty(mediaItem.Type))
             {
                 mediaItem.Type = "Anime";
@@ -71,8 +70,8 @@ namespace ProiectMedii_Anime___Manga_Tracking_.Controllers
             if (ModelState.IsValid)
             {
                 _context.Add(mediaItem);
-                await _context.SaveChangesAsync(); // Aici se salvează în SQL
-                return RedirectToAction(nameof(Index)); // Te trimite la lista unde vei vedea noul rând
+                await _context.SaveChangesAsync(); 
+                return RedirectToAction(nameof(Index)); 
             }
 
             return View(mediaItem);
@@ -165,58 +164,54 @@ namespace ProiectMedii_Anime___Manga_Tracking_.Controllers
         {
             return _context.MediaItem.Any(e => e.Id == id);
         }
-
+        // --- UPDATE PROGRESS ---
         [HttpPost]
         [Authorize]
-        public async Task<IActionResult> AddReview(int mediaId, int rating, string comment)
-        {
-            var review = new Review
-            {
-                MediaItemId = mediaId,
-                StarRating = rating,
-                Comment = comment,
-                UserEmail = User.Identity.Name // salvăm cine a scris review-ul
-            };
-
-            _context.Review.Add(review);
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Details), new { id = mediaId });
-        }
-
-        [HttpPost]
-        [Authorize]
+        [ValidateAntiForgeryToken]
+        [Route("MediaItems/UpdateProgress")] 
         public async Task<IActionResult> UpdateProgress(int mediaId, int progress)
         {
-            // 1. Obținem ID-ul utilizatorului logat (nu email-ul)
-            var userId = _userManager.GetUserId(User);
+            var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrEmpty(userId)) return Challenge();
 
-            if (string.IsNullOrEmpty(userId))
-            {
-                return Challenge(); // Te trimite la Login dacă nu ești logat
-            }
-
-            // 2. Căutăm tracker-ul folosind UserId
             var tracker = await _context.UserTracker
                 .FirstOrDefaultAsync(t => t.MediaItemId == mediaId && t.UserId == userId);
 
             if (tracker == null)
             {
-                // 3. Dacă nu există, creăm unul nou cu UserId
-                tracker = new UserTracker
-                {
-                    MediaItemId = mediaId,
-                    UserId = userId,
-                    Status = "In Progress" // Punem un status default obligatoriu
-                };
+                tracker = new UserTracker { MediaItemId = mediaId, UserId = userId, Status = "In Progress" };
                 _context.UserTracker.Add(tracker);
             }
 
-            // 4. Actualizăm progresul
             tracker.CurrentProgress = progress;
-
             await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Details), new { id = mediaId });
+
+            return RedirectToAction("Details", new { id = mediaId });
         }
+
+        // --- ADD REVIEW ---
+        [HttpPost]
+        [Authorize]
+        [ValidateAntiForgeryToken]
+        [Route("MediaItems/AddReview")] 
+        public async Task<IActionResult> AddReview(int mediaId, int rating, string comment)
+        {
+            if (mediaId == 0) return NotFound();
+
+            var review = new Review
+            {
+                MediaItemId = mediaId,
+                StarRating = rating,
+                Comment = comment,
+                UserEmail = User.Identity?.Name ?? "Anonymous"
+            };
+
+            _context.Review.Add(review);
+            await _context.SaveChangesAsync();
+
+            return RedirectToAction("Details", new { id = mediaId });
+        }
+
     }
 }
 

@@ -22,7 +22,8 @@
         <div class="col-md-6">
             <div style="background-color: #E0FBE2; padding: 15px; border-radius: 15px; margin-bottom: 20px; border: 1px solid #c3e6cb;">
                 <h4 style="color: #2D5A27;">🚀 Urmărește Progresul</h4>
-                <form asp-controller="Media" asp-action="UpdateProgress" method="post">
+
+                <form asp-controller="MediaItems" asp-action="UpdateProgress" method="post">
                     <input type="hidden" name="mediaId" value="@Model.Id" />
                     <div class="input-group mb-2">
                         <input type="number" name="progress" class="form-control" placeholder="La ce capitol ești?" required />
@@ -33,7 +34,8 @@
 
             <div style="background-color: #FFF0F5; padding: 15px; border-radius: 15px; border: 1px solid #f5c6cb;">
                 <h4 style="color: #C71585;">⭐ Lasă un Rating</h4>
-                <form asp-controller="Media" asp-action="AddReview" method="post">
+     
+                <form asp-controller="MediaItems" asp-action="AddReview" method="post">
                     <input type="hidden" name="mediaId" value="@Model.Id" />
                     <div class="mb-2">
                         <select name="rating" class="form-control">
